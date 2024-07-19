@@ -8,7 +8,7 @@ args = parser.parse_args()
 normalized = args.norm
 
 numFiles = 5
-fpath = 'BlackbodyStudiesData/2024-07-17/'
+fpath = 'BlackbodyStudiesData/2024-07-18/'
 fname = 'SNSPD-'
 
 plotDataXS = {}
@@ -60,6 +60,7 @@ if normalized:
     fXS = np.multiply(fXS, 1 / fXS[5])
 #print([(zXS[i], nRaysXS[i]) for i in range(len(fXS))])
 #plt.errorbar(zXS, fXS, yerr = errXS, fmt = 'o', label = '0.63mm x 0.63mm')
+#print(fXS)
 
 planeS = list(plotDataS.keys())
 irradS = {pos[2]: plotDataS[pos] for pos in planeS}
@@ -99,7 +100,6 @@ if normalized:
     errL = np.sqrt(np.square(np.divide(errL, fL[5])), np.square(np.divide(np.multiply(errL[10], errL), fL[10]**2)))
     fL = np.multiply(fL, 1 / fL[5])
 plt.errorbar(zL, fL, yerr = errL, fmt = 'o', label = '13.3mm x 13.3mm')
-print(fL)
 
 if normalized:
     plt.title('Normalized Power for Various Detector Sizes Along z-axis')
@@ -107,7 +107,7 @@ if normalized:
     plt.ylabel('Normalized Power')
     plt.xticks(np.arange(-20, 21, step=4))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-17/z-axis-irradiance-normalized.png')
+    plt.savefig('BlackbodyPlots/2024-07-18/z-axis-irradiance-normalized.png')
 
 else:
     plt.title('Power for Various Detector Sizes Along z-axis')
@@ -115,4 +115,9 @@ else:
     plt.ylabel('Power')
     plt.xticks(np.arange(-4, 6, step=2))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-17/z-axis-irradiance.png')
+    plt.savefig('BlackbodyPlots/2024-07-18/z-axis-irradiance.png')
+
+for f in fXS, fS, fM, fL:
+    zMin = zXS[np.argmin(f)]
+    print("zMin: {0}".format(zMin))
+    
