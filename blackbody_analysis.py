@@ -7,8 +7,8 @@ parser.add_argument('--norm', type = bool, default = False)
 args = parser.parse_args()
 normalized = args.norm
 
-numFiles = 11
-fpath = 'BlackbodyStudiesData/2024-07-20/'
+numFiles = 5
+fpath = 'BlackbodyStudiesData/2024-07-19/'
 fname = 'SNSPD-'
 
 plotDataXS = {}
@@ -107,7 +107,7 @@ if normalized:
     plt.ylabel('Normalized Power')
     plt.xticks(np.arange(-20, 21, step=4))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-20/z-axis-irradiance-normalized.png')
+    plt.savefig('BlackbodyPlots/2024-07-19/z-axis-irradiance-normalized.png')
 
 else:
     plt.title('Power for Various Detector Sizes Along z-axis')
@@ -115,7 +115,16 @@ else:
     plt.ylabel('Power')
     plt.xticks(np.arange(-4, 4.1, step=0.8))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-20/z-axis-irradiance.png')
+    plt.savefig('BlackbodyPlots/2024-07-19/z-axis-irradiance.png')
+
+    plt.clf()
+    plt.errorbar(zXS, fXS, yerr = errXS, fmt = 'o', label = '0.63mm x 0.63mm')
+    plt.title('Power for Various Detector Sizes Along z-axis')
+    plt.xlabel('z Shift from Focus (mm)')
+    plt.ylabel('Power')
+    plt.xticks(np.arange(-4, 4.1, step=0.8))
+    plt.legend()
+    plt.savefig('BlackbodyPlots/2024-07-19/z-axis-irradiance-xs.png')
 
 for f in fXS, fS, fM, fL:
     zMin = zXS[np.argmin(f)]
