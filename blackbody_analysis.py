@@ -9,8 +9,8 @@ parser.add_argument('--norm', type = bool, default = False)
 args = parser.parse_args()
 normalized = args.norm
 
-numFiles = 5
-fpath = 'BlackbodyStudiesData/2024-07-19/'
+numFiles = 8
+fpath = 'BlackbodyStudiesData/2024-07-23/'
 fname = 'SNSPD-'
 
 plotDataXS = {}
@@ -67,69 +67,86 @@ for findex in range(numFiles):
 
     xGrid = np.arange(xMin, xMax, (xMax - xMin) / xBins) 
     yGrid = np.arange(yMin, yMax, (yMax - yMin) / yBins)
+
     plt.clf()
     plt.pcolormesh(xGrid, yGrid, dataArray, cmap = 'rainbow', shading = 'nearest')
     plt.gca().set_aspect('equal')
     plt.colorbar()
+    plt.title('Irradiance on the SNSPD at z = {0}mm'.format(round(originPos[2], 2)))
+    plt.xlabel('Local x Position (mm)')
+    plt.ylabel('Local y Position (mm)')
+    
     try:
-        plt.savefig('BlackbodyPlots/2024-07-19/2D/testing2DGrid-{0}.png'.format(findex))
+        plt.savefig('BlackbodyPlots/2024-07-23/2D/testing2DGrid-{0}.png'.format(findex))
     except FileNotFoundError:
-        os.mkdir('BlackbodyPlots/2024-07-19/2D/')
-        plt.savefig('BlackbodyPlots/2024-07-19/2D/testing2DGrid-{0}.png'.format(findex))
+        try:
+            os.mkdir('BlackbodyPlots/2024-07-23')
+        except FileExistsError:
+           pass 
+        os.mkdir('BlackbodyPlots/2024-07-23/2D/')
+        plt.savefig('BlackbodyPlots/2024-07-23/2D/testing2DGrid-{0}.png'.format(findex))
+
+plt.clf()
+plt.gca().set_aspect('auto')
 
 planeXS = list(plotDataXS.keys())
 irradXS = {pos[2]: plotDataXS[pos] for pos in planeXS}
 sortedXS = sorted(irradXS.items())    
 zXS, fXS = zip(*sortedXS)
 
-nRaysXS = [irrad * 10**8 * (0.03333/21)**2 for irrad in fXS]
-errXS = np.sqrt(nRaysXS) * 10**-8 / ((0.03333 / 21) ** 2)
+nRaysXS = [irrad * 10**8 * (0.005/21)**2 for irrad in fXS]
+errXS = np.sqrt(nRaysXS) * 10**-8 / ((1 / 21) ** 2)
 
 if normalized:
     errXS = np.sqrt(np.square(np.divide(errXS, fXS[5])), np.square(np.divide(np.multiply(errXS[10], errXS), fXS[10]**2)))
     fXS = np.multiply(fXS, 1 / fXS[5])
-#print([(zXS[i], nRaysXS[i]) for i in range(len(fXS))])
-#plt.errorbar(zXS, fXS, yerr = errXS, fmt = 'o', label = '0.63mm x 0.63mm')
-#print(fXS)
+#plt.errorbar(zXS, fXS, yerr = errXS, fmt = 'o', label = '{0}mm x {0}mm'.format(round(2 * xMax * 1/21, 2)))
 
 planeS = list(plotDataS.keys())
 irradS = {pos[2]: plotDataS[pos] for pos in planeS}
 sortedS = sorted(irradS.items())[:]    
 zS, fS = zip(*sortedS)
 
-nRaysS = [irrad * 10**8 * (0.03333/21)**2 for irrad in fS]
-errS = np.sqrt(nRaysS) * 10**-8 / ((0.03333 / 21) ** 2)
+nRaysS = [irrad * 10**8 * ((xMax - xMin) / (xBins * 200))**2 for irrad in fS]
+errS = np.sqrt(nRaysS) * 10**-8 / ((1 / 21) ** 2)
+errS = np.sqrt(nRaysS) * 10**-8
+nRaysS = [num * 10**-8 for num in nRaysS]
 
 if normalized:
     errS = np.sqrt(np.square(np.divide(errS, fS[5])), np.square(np.divide(np.multiply(errS[10], errS), fS[10]**2)))
     fS = np.multiply(fS, 1 / fS[5])
-plt.errorbar(zS, fS, yerr = errS, fmt = 'o', label = '1.9mm x 1.9mm')
+#plt.errorbar(zS, fS, yerr = errS, fmt = 'o', label = '{0}mm x {0}mm'.format(round(2 * xMax * 3/21, 2)))
 
 planeM = list(plotDataM.keys())
 irradM = {pos[2]: plotDataM[pos] for pos in planeM}
 sortedM = sorted(irradM.items())[:] 
 zM, fM = zip(*sortedM)
 
-nRaysM = [irrad * 10**8 * (0.03333/21)**2 for irrad in fM]
-errM = np.sqrt(nRaysM) * 10**-8 / ((0.03333 / 21) ** 2)
+nRaysM = [irrad * 10**8 * ((xMax - xMin) / (xBins * 200))**2 for irrad in fM]
+errM = np.sqrt(nRaysM) * 10**-8 / ((1 / 21) ** 2)
+errM = np.sqrt(nRaysM) * 10**-8
+nRaysM = [num * 10**-8 for num in nRaysM]
 
 if normalized:
     errM = np.sqrt(np.square(np.divide(errM, fM[5])), np.square(np.divide(np.multiply(errM[10], errM), fM[10]**2)))
     fM = np.multiply(fM, 1 / fM[5])
-plt.errorbar(zM, fM, yerr = errM, fmt = 'o', label = '3.2mm x 3.2mm')
+plt.errorbar(zM, nRaysM, yerr = errM, fmt = 'o', label = '{0}mm x {0}mm'.format(round(2 * xMax * 5/21, 2)))
 
 planeL = list(plotDataL.keys())
 irradL = {pos[2]: plotDataL[pos] for pos in planeL}
 sortedL = sorted(irradL.items())[:]    
 zL, fL = zip(*sortedL)
 
-nRaysL = [irrad * 10**8 * (0.03333/21)**2 for irrad in fL]
-errL = np.sqrt(nRaysL) * 10**-8 / ((0.03333 / 21) ** 2)
+nRaysL = [irrad * 10**8 * ((xMax - xMin) / (xBins * 200))**2 for irrad in fL]
+print(nRaysL)
+errL = np.sqrt(nRaysL) * 10**-8 / ((1 / 21) ** 2)
+errL = np.sqrt(nRaysL) * 10**-8
+nRaysL = [num * 10**-8 for num in nRaysL]
 
 if normalized:
     errL = np.sqrt(np.square(np.divide(errL, fL[5])), np.square(np.divide(np.multiply(errL[10], errL), fL[10]**2)))
     fL = np.multiply(fL, 1 / fL[5])
-plt.errorbar(zL, fL, yerr = errL, fmt = 'o', label = '13.3mm x 13.3mm')
+plt.errorbar(zL, nRaysL, yerr = errL, fmt = 'o', label = '{0}mm x {0}mm'.format(round(2 * xMax, 2)))
 
 if normalized:
     plt.title('Normalized Power for Various Detector Sizes Along z-axis')
@@ -137,24 +154,25 @@ if normalized:
     plt.ylabel('Normalized Power')
     plt.xticks(np.arange(-20, 21, step=4))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-19/z-axis-irradiance-normalized.png')
+    plt.savefig('BlackbodyPlots/2024-07-23/z-axis-irradiance-normalized.png')
 
 else:
     plt.title('Power for Various Detector Sizes Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
-    plt.xticks(np.arange(-4, 4.1, step=2))
+    plt.ylabel('Prop. of Total Rays')
+    plt.xticks(np.arange(-10, 4.1, step=2))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-19/z-axis-irradiance.png')
+    plt.savefig('BlackbodyPlots/2024-07-23/z-axis-irradiance.png')
 
     plt.clf()
     plt.errorbar(zXS, fXS, yerr = errXS, fmt = 'o', label = '0.63mm x 0.63mm')
     plt.title('Power for Various Detector Sizes Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
-    plt.xticks(np.arange(-4, 4.1, step=2))
+    plt.xticks(np.arange(-10, 4.1, step=2))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-19/z-axis-irradiance-xs.png')
+    plt.savefig('BlackbodyPlots/2024-07-23/z-axis-irradiance-xs.png')
 
 for f in fXS, fS, fM, fL:
     zMin = zXS[np.argmin(f)]
@@ -163,9 +181,3 @@ for f in fXS, fS, fM, fL:
     zDoubled = np.array([zXS[int(idx)] for idx in fDoubled])
     topOfValley = zDoubled[min(np.where(zDoubled > 0)[0])]
     print("Top of Valley: {0}".format(topOfValley))
-
-xGrid = np.arange(xMin, xMax + 0.01, (xMax - xMin) / xBins) 
-yGrid = np.arange(yMin, yMax + 0.01, (yMax - yMin) / yBins)
-plt.clf()
-plt.pcolormesh(xGrid, yGrid, dataArray, cmap = 'RdBu', shading = 'flat')
-plt.savefig('testing2DGrid.png')
