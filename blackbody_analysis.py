@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import os
+
 
 parser = argparse.ArgumentParser(description = 'FRED Data File Analyzer')
 parser.add_argument('--norm', type = bool, default = False)
@@ -24,13 +26,29 @@ for findex in range(numFiles):
                 splitLine = line.strip().split(' ')
                 originPos = (float(splitLine[1]) * 200, float(splitLine[2]) * 200, float(splitLine[3]) * 200)
 
+            elif 'A_AXIS_MIN' in line:
+                line = line.strip().split(' ')
+                xMin = float(line[1]) * 200
+
+            elif 'A_AXIS_MAX' in line:
+                line = line.strip().split(' ')
+                xMax = float(line[1]) * 200
+
+            elif 'B_AXIS_MIN' in line:
+                line = line.strip().split(' ')
+                yMin = float(line[1]) * 200
+
+            elif 'B_AXIS_MAX' in line:
+                line = line.strip().split(' ')
+                yMax = float(line[1]) * 200
+
             elif 'A_AXIS_DIM' in line:
-                line.strip().split(' ')
-                xBins = line[1]
+                line = line.strip().split(' ')
+                xBins = int(line[1])
 
             elif 'B_AXIS_DIM' in line:
-                line.strip().split(' ')
-                yBins = line[1]
+                line = line.strip().split(' ')
+                yBins = int(line[1])
 
             line = f.readline()
 
@@ -46,6 +64,18 @@ for findex in range(numFiles):
         plotDataS[originPos] = np.sum(dataArray[8:13, 8:13])
         plotDataM[originPos] = np.sum(dataArray[6:15, 6:15])
         plotDataL[originPos] = np.sum(dataArray[:, :])
+
+    xGrid = np.arange(xMin, xMax, (xMax - xMin) / xBins) 
+    yGrid = np.arange(yMin, yMax, (yMax - yMin) / yBins)
+    plt.clf()
+    plt.pcolormesh(xGrid, yGrid, dataArray, cmap = 'rainbow', shading = 'nearest')
+    plt.gca().set_aspect('equal')
+    plt.colorbar()
+    try:
+        plt.savefig('BlackbodyPlots/2024-07-19/2D/testing2DGrid-{0}.png'.format(findex))
+    except FileNotFoundError:
+        os.mkdir('BlackbodyPlots/2024-07-19/2D/')
+        plt.savefig('BlackbodyPlots/2024-07-19/2D/testing2DGrid-{0}.png'.format(findex))
 
 planeXS = list(plotDataXS.keys())
 irradXS = {pos[2]: plotDataXS[pos] for pos in planeXS}
@@ -113,7 +143,7 @@ else:
     plt.title('Power for Various Detector Sizes Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
-    plt.xticks(np.arange(-4, 4.1, step=0.8))
+    plt.xticks(np.arange(-4, 4.1, step=2))
     plt.legend()
     plt.savefig('BlackbodyPlots/2024-07-19/z-axis-irradiance.png')
 
@@ -122,11 +152,20 @@ else:
     plt.title('Power for Various Detector Sizes Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
-    plt.xticks(np.arange(-4, 4.1, step=0.8))
+    plt.xticks(np.arange(-4, 4.1, step=2))
     plt.legend()
     plt.savefig('BlackbodyPlots/2024-07-19/z-axis-irradiance-xs.png')
 
 for f in fXS, fS, fM, fL:
     zMin = zXS[np.argmin(f)]
     print("zMin: {0}".format(zMin))
-    
+    fDoubled = np.where(f > 2.5 * f[np.argmin(f)])[0]
+    zDoubled = np.array([zXS[int(idx)] for idx in fDoubled])
+    topOfValley = zDoubled[min(np.where(zDoubled > 0)[0])]
+    print("Top of Valley: {0}".format(topOfValley))
+
+xGrid = np.arange(xMin, xMax + 0.01, (xMax - xMin) / xBins) 
+yGrid = np.arange(yMin, yMax + 0.01, (yMax - yMin) / yBins)
+plt.clf()
+plt.pcolormesh(xGrid, yGrid, dataArray, cmap = 'RdBu', shading = 'flat')
+plt.savefig('testing2DGrid.png')

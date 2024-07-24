@@ -1,0 +1,13 @@
+2024-07-02: 0.2 source, 0.1 block
+2024-07-03: 0.2 source, 0.15 block
+2024-07-05: 0.3 source, 0.1 block
+2024-07-07: 0.3 source, 0.15 block
+2024-07-09: 0.15 source, 0.075 block
+2024-07-10: 0.3 source, 0.075 block
+2024-07-15: 0.4 source, 0.07 block
+2024-07-17: 0.4 source, 0.07 block, half height block
+2024-07-18: round source, square block
+2024-07-19: square source, square block
+2024-07-20: 0.4 sq. source, 0.07 sq. block
+
+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
