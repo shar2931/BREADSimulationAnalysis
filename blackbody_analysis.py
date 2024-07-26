@@ -10,7 +10,7 @@ args = parser.parse_args()
 normalized = args.norm
 
 numFiles = 8
-fpath = 'BlackbodyStudiesData/2024-07-23/'
+fpath = 'BlackbodyStudiesData/2024-07-25/'
 fname = 'SNSPD-'
 
 plotDataXS = {}
@@ -77,14 +77,14 @@ for findex in range(numFiles):
     plt.ylabel('Local y Position (mm)')
     
     try:
-        plt.savefig('BlackbodyPlots/2024-07-23/2D/testing2DGrid-{0}.png'.format(findex))
+        plt.savefig('BlackbodyPlots/2024-07-25/2D/testing2DGrid-{0}.png'.format(findex))
     except FileNotFoundError:
         try:
-            os.mkdir('BlackbodyPlots/2024-07-23')
+            os.mkdir('BlackbodyPlots/2024-07-25')
         except FileExistsError:
            pass 
-        os.mkdir('BlackbodyPlots/2024-07-23/2D/')
-        plt.savefig('BlackbodyPlots/2024-07-23/2D/testing2DGrid-{0}.png'.format(findex))
+        os.mkdir('BlackbodyPlots/2024-07-25/2D/')
+        plt.savefig('BlackbodyPlots/2024-07-25/2D/testing2DGrid-{0}.png'.format(findex))
 
 plt.clf()
 plt.gca().set_aspect('auto')
@@ -94,8 +94,8 @@ irradXS = {pos[2]: plotDataXS[pos] for pos in planeXS}
 sortedXS = sorted(irradXS.items())    
 zXS, fXS = zip(*sortedXS)
 
-nRaysXS = [irrad * 10**8 * (0.005/21)**2 for irrad in fXS]
-errXS = np.sqrt(nRaysXS) * 10**-8 / ((1 / 21) ** 2)
+nRaysXS = [irrad * 10**8 * ((xMax - xMin) / (xBins * 200))**2 for irrad in fXS]
+errXS = np.sqrt(nRaysXS) * 10**-8 / (((xMax - xMin) / (xBins * 200)) ** 2)
 
 if normalized:
     errXS = np.sqrt(np.square(np.divide(errXS, fXS[5])), np.square(np.divide(np.multiply(errXS[10], errXS), fXS[10]**2)))
@@ -108,7 +108,7 @@ sortedS = sorted(irradS.items())[:]
 zS, fS = zip(*sortedS)
 
 nRaysS = [irrad * 10**8 * ((xMax - xMin) / (xBins * 200))**2 for irrad in fS]
-errS = np.sqrt(nRaysS) * 10**-8 / ((1 / 21) ** 2)
+errS = np.sqrt(nRaysS) * 10**-8 / (((xMax - xMin) / (xBins * 200)) ** 2)
 errS = np.sqrt(nRaysS) * 10**-8
 nRaysS = [num * 10**-8 for num in nRaysS]
 
@@ -123,14 +123,14 @@ sortedM = sorted(irradM.items())[:]
 zM, fM = zip(*sortedM)
 
 nRaysM = [irrad * 10**8 * ((xMax - xMin) / (xBins * 200))**2 for irrad in fM]
-errM = np.sqrt(nRaysM) * 10**-8 / ((1 / 21) ** 2)
+errM = np.sqrt(nRaysM) * 10**-8 / (((xMax - xMin) / (xBins * 200)) ** 2)
 errM = np.sqrt(nRaysM) * 10**-8
 nRaysM = [num * 10**-8 for num in nRaysM]
 
 if normalized:
     errM = np.sqrt(np.square(np.divide(errM, fM[5])), np.square(np.divide(np.multiply(errM[10], errM), fM[10]**2)))
     fM = np.multiply(fM, 1 / fM[5])
-plt.errorbar(zM, nRaysM, yerr = errM, fmt = 'o', label = '{0}mm x {0}mm'.format(round(2 * xMax * 5/21, 2)))
+#plt.errorbar(zM, nRaysM, yerr = errM, fmt = 'o', label = '{0}mm x {0}mm'.format(round(2 * xMax * 5/21, 2)))
 
 planeL = list(plotDataL.keys())
 irradL = {pos[2]: plotDataL[pos] for pos in planeL}
@@ -139,7 +139,7 @@ zL, fL = zip(*sortedL)
 
 nRaysL = [irrad * 10**8 * ((xMax - xMin) / (xBins * 200))**2 for irrad in fL]
 print(nRaysL)
-errL = np.sqrt(nRaysL) * 10**-8 / ((1 / 21) ** 2)
+errL = np.sqrt(nRaysL) * 10**-8 / (((xMax - xMin) / (xBins * 200)) ** 2)
 errL = np.sqrt(nRaysL) * 10**-8
 nRaysL = [num * 10**-8 for num in nRaysL]
 
@@ -154,25 +154,25 @@ if normalized:
     plt.ylabel('Normalized Power')
     plt.xticks(np.arange(-20, 21, step=4))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-23/z-axis-irradiance-normalized.png')
+    plt.savefig('BlackbodyPlots/2024-07-25/z-axis-irradiance-normalized.png')
 
 else:
-    plt.title('Power for Various Detector Sizes Along z-axis')
+    plt.title('Prop. of Total Rays for Various Detector Sizes Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
     plt.ylabel('Prop. of Total Rays')
-    plt.xticks(np.arange(-10, 4.1, step=2))
+    plt.xticks(np.arange(-0.2, 0.16, step=0.05))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-23/z-axis-irradiance.png')
+    plt.savefig('BlackbodyPlots/2024-07-25/z-axis-irradiance.png')
 
     plt.clf()
     plt.errorbar(zXS, fXS, yerr = errXS, fmt = 'o', label = '0.63mm x 0.63mm')
     plt.title('Power for Various Detector Sizes Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
-    plt.xticks(np.arange(-10, 4.1, step=2))
+    plt.xticks(np.arange(-0.2, 0.16, step=0.05))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-23/z-axis-irradiance-xs.png')
+    plt.savefig('BlackbodyPlots/2024-07-25/z-axis-irradiance-xs.png')
 
 for f in fXS, fS, fM, fL:
     zMin = zXS[np.argmin(f)]
