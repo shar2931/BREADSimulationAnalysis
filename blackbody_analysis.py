@@ -9,8 +9,8 @@ parser.add_argument('--norm', type = bool, default = False)
 args = parser.parse_args()
 normalized = args.norm
 
-numFiles = 10
-fpath = 'BlackbodyStudiesData/2024-07-21/'
+numFiles = 8
+fpath = 'BlackbodyStudiesData/2024-07-18/'
 fname = 'SNSPD-'
 
 plotDataXS = {}
@@ -67,27 +67,26 @@ for findex in range(numFiles):
 
     xBinWidth = (xMax - xMin) / xBins
     yBinWidth = (yMax - yMin) / yBins
-    print(xBinWidth)
     xGrid = np.arange(xMin + (xBinWidth / 2), xMax + (xBinWidth / 2), xBinWidth) 
     yGrid = np.arange(yMin + (yBinWidth / 2), yMax + (xBinWidth / 2), yBinWidth)
 
     plt.clf()
-    plt.pcolormesh(xGrid, yGrid, dataArray, cmap = 'rainbow', shading = 'nearest')
+    plt.pcolormesh(xGrid, yGrid, dataArray * 10**8 * ((xMax - xMin) / (xBins * 200))**2, cmap = 'rainbow', shading = 'nearest')
     plt.gca().set_aspect('equal')
     plt.colorbar()
-    plt.title('Irradiance on the SNSPD at z = {0}mm'.format(round(originPos[2], 2)))
+    plt.title('Number of Rays on the SNSPD at z = {0}mm'.format(round(originPos[2], 2)))
     plt.xlabel('Local x Position (mm)')
     plt.ylabel('Local y Position (mm)')
     
     try:
-        plt.savefig('BlackbodyPlots/2024-07-21/2D/testing2DGrid-{0}.png'.format(findex))
+        plt.savefig('BlackbodyPlots/2024-07-18/2D/testing2DGrid-{0}.png'.format(findex))
     except FileNotFoundError:
         try:
-            os.mkdir('BlackbodyPlots/2024-07-21')
+            os.mkdir('BlackbodyPlots/2024-07-18')
         except FileExistsError:
            pass 
-        os.mkdir('BlackbodyPlots/2024-07-21/2D/')
-        plt.savefig('BlackbodyPlots/2024-07-21/2D/testing2DGrid-{0}.png'.format(findex))
+        os.mkdir('BlackbodyPlots/2024-07-18/2D/')
+        plt.savefig('BlackbodyPlots/2024-07-18/2D/testing2DGrid-{0}.png'.format(findex))
 
 plt.clf()
 plt.gca().set_aspect('auto')
@@ -141,7 +140,6 @@ sortedL = sorted(irradL.items())[:]
 zL, fL = zip(*sortedL)
 
 nRaysL = [irrad * 10**8 * ((xMax - xMin) / (xBins * 200))**2 for irrad in fL]
-print(nRaysL)
 errL = np.sqrt(nRaysL) * 10**-8 / (((xMax - xMin) / (xBins * 200)) ** 2)
 errL = np.sqrt(nRaysL) * 10**-8
 nRaysL = [num * 10**-8 for num in nRaysL]
@@ -150,6 +148,7 @@ if normalized:
     errL = np.sqrt(np.square(np.divide(errL, fL[5])), np.square(np.divide(np.multiply(errL[10], errL), fL[10]**2)))
     fL = np.multiply(fL, 1 / fL[5])
 plt.errorbar(zL, nRaysL, yerr = errL, fmt = 'o', label = '{0}mm x {0}mm'.format(round(2 * xMax, 2)))
+print(nRaysL)
 
 if normalized:
     plt.title('Normalized Power for Various Detector Sizes Along z-axis')
@@ -157,25 +156,25 @@ if normalized:
     plt.ylabel('Normalized Power')
     plt.xticks(np.arange(-20, 21, step=4))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-21/z-axis-irradiance-normalized.png')
+    plt.savefig('BlackbodyPlots/2024-07-18/z-axis-irradiance-normalized.png')
 
 else:
-    plt.title('Prop. of Total Rays for Various Detector Sizes Along z-axis')
+    plt.title('Prop. of Total Rays on Realistic SNSPD Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
     plt.ylabel('Prop. of Total Rays')
-    plt.xticks(np.arange(-10, 10.1, step=2.0))
+    plt.xticks(np.arange(-10.0, 10.1, step=2))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-21/z-axis-irradiance.png')
+    plt.savefig('BlackbodyPlots/2024-07-18/z-axis-irradiance.png')
 
     plt.clf()
     plt.errorbar(zXS, fXS, yerr = errXS, fmt = 'o', label = '0.63mm x 0.63mm')
     plt.title('Power for Various Detector Sizes Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
-    plt.xticks(np.arange(-10, 10.1, step=2.0))
+    plt.xticks(np.arange(-0.2, 0.16, step=0.05))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-21/z-axis-irradiance-xs.png')
+    #plt.savefig('BlackbodyPlots/2024-07-18/z-axis-irradiance-xs.png')
 
 for f in fXS, fS, fM, fL:
     zMin = zXS[np.argmin(f)]
