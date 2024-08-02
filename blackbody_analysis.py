@@ -10,7 +10,7 @@ args = parser.parse_args()
 normalized = args.norm
 
 numFiles = 8
-fpath = 'BlackbodyStudiesData/2024-07-18/'
+fpath = 'BlackbodyStudiesData/2024-07-25/'
 fname = 'SNSPD-'
 
 plotDataXS = {}
@@ -79,14 +79,14 @@ for findex in range(numFiles):
     plt.ylabel('Local y Position (mm)')
     
     try:
-        plt.savefig('BlackbodyPlots/2024-07-18/2D/testing2DGrid-{0}.png'.format(findex))
+        plt.savefig('BlackbodyPlots/2024-07-25/2D/testing2DGrid-{0}.png'.format(findex))
     except FileNotFoundError:
         try:
-            os.mkdir('BlackbodyPlots/2024-07-18')
+            os.mkdir('BlackbodyPlots/2024-07-25')
         except FileExistsError:
            pass 
-        os.mkdir('BlackbodyPlots/2024-07-18/2D/')
-        plt.savefig('BlackbodyPlots/2024-07-18/2D/testing2DGrid-{0}.png'.format(findex))
+        os.mkdir('BlackbodyPlots/2024-07-25/2D/')
+        plt.savefig('BlackbodyPlots/2024-07-25/2D/testing2DGrid-{0}.png'.format(findex))
 
 plt.clf()
 plt.gca().set_aspect('auto')
@@ -147,7 +147,7 @@ nRaysL = [num * 10**-8 for num in nRaysL]
 if normalized:
     errL = np.sqrt(np.square(np.divide(errL, fL[5])), np.square(np.divide(np.multiply(errL[10], errL), fL[10]**2)))
     fL = np.multiply(fL, 1 / fL[5])
-plt.errorbar(zL, nRaysL, yerr = errL, fmt = 'o', label = '{0}mm x {0}mm'.format(round(2 * xMax, 2)))
+plt.errorbar(zL, nRaysL, yerr = errL, fmt = 'o', linestyle = '--', label = '{0}mm x {0}mm'.format(round(2 * xMax, 2)))
 print(nRaysL)
 
 if normalized:
@@ -156,16 +156,16 @@ if normalized:
     plt.ylabel('Normalized Power')
     plt.xticks(np.arange(-20, 21, step=4))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-18/z-axis-irradiance-normalized.png')
+    plt.savefig('BlackbodyPlots/2024-07-25/z-axis-irradiance-normalized.png')
 
 else:
     plt.title('Prop. of Total Rays on Realistic SNSPD Along z-axis')
     plt.xlabel('z Shift from Focus (mm)')
     plt.ylabel('Power')
     plt.ylabel('Prop. of Total Rays')
-    plt.xticks(np.arange(-10.0, 10.1, step=2))
+    plt.xticks(np.arange(-0.2, 0.16, step=0.05))
     plt.legend()
-    plt.savefig('BlackbodyPlots/2024-07-18/z-axis-irradiance.png')
+    plt.savefig('BlackbodyPlots/2024-07-25/z-axis-irradiance.png')
 
     plt.clf()
     plt.errorbar(zXS, fXS, yerr = errXS, fmt = 'o', label = '0.63mm x 0.63mm')
@@ -174,7 +174,7 @@ else:
     plt.ylabel('Power')
     plt.xticks(np.arange(-0.2, 0.16, step=0.05))
     plt.legend()
-    #plt.savefig('BlackbodyPlots/2024-07-18/z-axis-irradiance-xs.png')
+    #plt.savefig('BlackbodyPlots/2024-07-25/z-axis-irradiance-xs.png')
 
 for f in fXS, fS, fM, fL:
     zMin = zXS[np.argmin(f)]

@@ -1,0 +1,70 @@
+'#Language "WWB-COM"
+
+Option Explicit
+
+Sub Main
+	ARNDeleteAllNodes()
+	ClearOutputWindow()
+
+	Dim detector As Long
+	detector = FindFullName( "Analysis Surface(s).SNSPD" )
+
+	Dim block As Long
+	block = FindFullName( "Geometry.Block" )
+
+	Dim blockShiftOp As T_OPERATION
+	Dim detShiftOp As T_OPERATION
+	GetOperation(block, 2, blockShiftOp)
+	GetOperation(detector, 1, detShiftOp)
+
+	Dim source As Long
+	source = FindFullName( "Optical Sources.AbsorberEmission" )
+
+	Dim curX As Double, curY As Double, curZ As Double
+	Dim stepSize As Double
+
+	stepSize = 0.05
+
+	Const outPath As String = "D:\shardulr\FGDFiles\2024-07-31\"
+	MkDir( outPath )
+	Const outputFile As String = outPath & "SNSPD-"
+
+	Dim i As Integer
+	i = 0
+
+	For curX = -0.0025 To 0.0025 Step 0.0025
+		For curY = -0.0025 To 0.0025 Step 0.0025
+			For curZ = -0.00025 To 0.00025 Step 0.00025
+				blockShiftOp.val1 = curX
+				blockShiftOp.val2 = curY
+				blockShiftOp.val3 = curZ
+				SetOperation(block, 2, blockShiftOp)
+				Update
+
+				detShiftOp.val1 = curX
+				detShiftOp.val2 = curY
+				detShiftOp.val3 = curZ
+				SetOperation(detector, 1, detShiftOp)
+				Update
+
+				DeleteRays()
+        		TraceCreate()
+
+        		Dim arnNum As Long
+        		arnNum = DEGetMostRecentARNNum(detector)
+        		ARNWriteToFile(arnNum, outputFile & i & ".dat", False, False)
+
+        		i = i + 1
+
+        		'ARNDeleteAllNodes()
+        		'Dim arnNode As Long
+
+        		'IrradianceToARN(detector, "Irradiation at " & Format(curX, "0.00") & ", " & Format(curY, "0.00") & ", " & Format(curZ, "0.00"), arnNode)
+        		'ARNDisplayInChart(arnNode, "")
+        		'ARNWriteToFile(arnNode, outputFile & Format(curX, "0.00") & "_" & Format(curY, "0.00") & "_" & Format(curZ, "0.00") & ".fgd", False, False)
+			Next
+		Next
+	Next
+
+
+End Sub
